@@ -1,39 +1,46 @@
-class Tomato:
-    states = {0:'Green',
-              1:'Yellow',
-              2:'Red'}
-    index = 0
+class Vegetable:
+    states = ["Отсутствует", "Цветение", "Зеленый", "Красный"]
 
     def __init__(self, index):
         self._index = index
-        self._state = 0
+        self._state = self.states[0]
 
-    def grow(self,index):
-        self._index +=1
-        self._state = Tomato.states[index]
+    def grow(self):
+        if self._state != self.states[-1]:
+            current_state_index = self.states.index(self._state)
+            self._state = self.states[current_state_index + 1]
 
-    def is_ripe(self,index):
-        if index == len(Tomato.states)-1:
-            return 'Созрел'
+    def is_ripe(self):
+        return self._state == self.states[-1]
+
+
+class Tomato(Vegetable):
+    def __init__(self, index, variety):
+        super().__init__(index)
+        self.variety = variety
+
+    def give_variety(self):
+        return self.variety
 
 
 class TomatoBush:
-    def __init__(self,count):
-        self.tomato_list = [Tomato(index) for index in range(0, count-1)]
+    varieties = ["Агата", "ДеБарао", "Бычье сердце", "Сливка"]
+
+    def __init__(self, tomato_count):
+        self.tomatoes = [Tomato(index, self.varieties[0]) for index in range(tomato_count)]
 
     def grow_all(self):
-        for tomato in self.tomato_list:
-            tomato.grow(Tomato.index)
+        for tomato in self.tomatoes:
+            tomato.grow()
 
     def all_are_ripe(self):
-        return all([tomato.is_ripe(Tomato.index) for tomato in self.tomato_list])
+        return all([tomato.is_ripe() for tomato in self.tomatoes])
 
     def give_away_all(self):
         self.tomatoes = []
 
 
 class Gardener:
-
     def __init__(self, name, plant):
         self.name = name
         self._plant = plant
@@ -44,28 +51,26 @@ class Gardener:
     def harvest(self):
         if self._plant.all_are_ripe():
             self._plant.give_away_all()
+            print('Урожай собран')
+        else:
+            print("Не все помидоры созрели.")
+            return False
 
     @staticmethod
     def knowledge_base():
-        print('Справка по садоводству будет в обновлённой версии. Сорян:(')
+        print("Harvest time for tomatoes should ideally occur\n"
+              "when the fruit is a mature green and\n"
+              "then allowed to ripen off the vine.\n"
+              "This prevents splitting or bruising\n"
+              "and allows for a measure of control over the ripening process.")
 
 
-    Gardener.knowledge_base()
-    great_tomato_bush = TomatoBush(4)
-    gardener = Gardener('Tomate_one', great_tomato_bush)
-    gardener.work()
-    gardener.work()
-    gardener.harvest()
-    gardener.work()
-    gardener.harvest()
+# Тесты
+tomato_bush = TomatoBush(3)  # Инициализируем куст
+gardener = Gardener("Иван", tomato_bush)  # Инициализируем садовника
+gardener.knowledge_base()  # Выводим справку по садоводству
 
-
-
-
-
-
-
-
-
-
-
+for tomato in tomato_bush.tomatoes:
+    print(Tomato.give_variety(tomato))  # Сорт помидоров
+while gardener.harvest() is False:
+    gardener.work()  # Работаем пока помидоры не созреют
